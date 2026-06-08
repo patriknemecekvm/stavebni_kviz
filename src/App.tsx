@@ -2,9 +2,31 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
-import { useSubmitQuizResult, useGetQuizStats, getGetQuizStatsQueryKey, useGetTeamResults, getGetTeamResultsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import OwnerPage from "./OwnerPage";
+const useSubmitQuizResult = () => ({
+  mutateAsync: async (data: any) => {
+    const key = `quiz-results-${data.teamId || "default"}`;
+    const existing = JSON.parse(localStorage.getItem(key) || "[]");
+    localStorage.setItem(key, JSON.stringify([...existing, data]));
+    return data;
+  },
+});
+
+const useGetQuizStats = () => ({
+  data: null,
+  isLoading: false,
+});
+
+const useGetTeamResults = (teamId: string) => ({
+  data: JSON.parse(
+    localStorage.getItem(`quiz-results-${teamId || "default"}`) || "[]"
+  ),
+  isLoading: false,
+});
+
+const getGetQuizStatsQueryKey = () => ["quiz-stats"];
+const getGetTeamResultsQueryKey = () => ["team-results"];
 
 interface Question {
   q: string;

@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import OwnerPage from "./OwnerPage";
 const useSubmitQuizResult = () => ({
   mutateAsync: async (data: any) => {
     const key = `quiz-results-${data.teamId || "default"}`;

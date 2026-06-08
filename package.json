@@ -12,6 +12,7 @@
     "@vitejs/plugin-react": "latest",
     "@tailwindcss/vite": "latest",
     "@tailwindcss/typography": "latest",
+    "@tanstack/react-query": "latest",
     "vite": "latest",
     "typescript": "latest",
     "react": "latest",

@@ -18,7 +18,8 @@
     "lucide-react": "latest",
     "framer-motion": "latest",
     "recharts": "latest",
-    "wouter": "latest"
+    "wouter": "latest",
+    "tw-animate-css": "latest"
   },
   "devDependencies": {
     "@types/react": "latest",

@@ -17,12 +17,16 @@ const useGetQuizStats = () => ({
   isLoading: false,
 });
 
-const useGetTeamResults = (teamId: string) => ({
-  data: JSON.parse(
+const useGetTeamResults = (teamId: string) => {
+  const results = JSON.parse(
     localStorage.getItem(`quiz-results-${teamId || "default"}`) || "[]"
-  ),
-  isLoading: false,
-});
+  );
+
+  return {
+    data: { results },
+    isLoading: false,
+  };
+};
 
 const getGetQuizStatsQueryKey = () => ["quiz-stats"];
 const getGetTeamResultsQueryKey = () => ["team-results"];

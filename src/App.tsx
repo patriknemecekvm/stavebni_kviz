@@ -327,14 +327,16 @@ const getGetTeamResultsQueryKey = (teamId: string) => [
   "team-results",
   teamId,
 ];
-    teamId ?? "",
-    { query: {
-      enabled: !!teamId && (gameState === "stats" || !!ADMIN_TEAM_ID),
-      queryKey: getGetTeamResultsQueryKey(teamId ?? ""),
-      refetchInterval: ADMIN_TEAM_ID ? 30000 : false,
-    }}
-  );
+const submitMutation = useSubmitQuizResult();
+const { data: globalStats } = useGetQuizStats();
 
+const {
+  data: teamResultsData,
+  isLoading: teamResultsLoading,
+  dataUpdatedAt,
+  refetch: refetchTeamResults,
+} = useGetTeamResults(teamId ?? "");
+    
   useEffect(() => {
     document.documentElement.classList.add("dark");
   }, []);

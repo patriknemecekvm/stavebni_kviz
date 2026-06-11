@@ -286,9 +286,47 @@ export default function App() {
   const queryClient = useQueryClient();
   const submittedRef = useRef(false);
 
-  const submitMutation = useSubmitQuizResult();
-  const { data: globalStats } = useGetQuizStats();
-  const { data: teamResultsData, isLoading: teamResultsLoading, dataUpdatedAt, refetch: refetchTeamResults } = useGetTeamResults(
+  const useSubmitQuizResult = () => ({
+  mutateAsync: async (input: any) => {
+    const data = input?.body ?? input;
+
+    const result = {
+      ...data,
+      completedAt: data.completedAt || new Date().toISOString(),
+    };
+
+    const key = `quiz-results-${result.teamId || "default"}`;
+    const existing = JSON.parse(localStorage.getItem(key) || "[]");
+
+    localStorage.setItem(key, JSON.stringify([...existing, result]));
+
+    return result;
+  },
+});
+
+const useGetQuizStats = () => ({
+  data: { results: [] },
+  isLoading: false,
+});
+
+const useGetTeamResults = (teamId: string, _options?: any) => {
+  const key = `quiz-results-${teamId || "default"}`;
+  const results = JSON.parse(localStorage.getItem(key) || "[]");
+
+  return {
+    data: { results },
+    isLoading: false,
+    dataUpdatedAt: Date.now(),
+    refetch: async () => ({ data: { results } }),
+  };
+};
+
+const getGetQuizStatsQueryKey = () => ["quiz-stats"];
+
+const getGetTeamResultsQueryKey = (teamId: string) => [
+  "team-results",
+  teamId,
+];
     teamId ?? "",
     { query: {
       enabled: !!teamId && (gameState === "stats" || !!ADMIN_TEAM_ID),

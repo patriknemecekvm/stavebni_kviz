@@ -405,16 +405,19 @@ const refetchTeamResults = async () => {};
     setTeamId(id);
   };
 
-  const handleCopyTeamLink = () => {
-    const link = `${window.location.origin}/team/${teamId}`;
-    navigator.clipboard.writeText(link).then(() => {
-      toast({
-        title: "Odkaz zkopírován!",
-        description: "Pošli ho partě — ať se přidají.",
-        className: "bg-primary text-primary-foreground border-none font-bold",
-      });
+ const handleCopyTeamLink = () => {
+  const PUBLIC_APP_URL = "https://stavebni-kviz.vercel.app";
+
+  const link = `${PUBLIC_APP_URL}/team/${teamId}`;
+
+  navigator.clipboard.writeText(link).then(() => {
+    toast({
+      title: "Odkaz zkopírován!",
+      description: "Pošli ho partě — ať se přidají.",
+      className: "bg-primary text-primary-foreground border-none font-bold",
     });
-  };
+  });
+};
 
   const handleShare = () => {
     const res = RESULTS[resultKey];

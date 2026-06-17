@@ -3,13 +3,31 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
+
 const useSubmitQuizResult = () => ({
-  mutateAsync: async (data: any) => {
-    const key = `quiz-results-${data.teamId || "default"}`;
-    const existing = JSON.parse(localStorage.getItem(key) || "[]");
-    localStorage.setItem(key, JSON.stringify([...existing, data]));
-    return data;
+  mutate: async (input: any, opts?: any) => {
+    const data = input?.data ?? input;
+
+    const { error } = await supabase.from("quiz_results").insert({
+      team_code: data.teamId || "default",
+      nickname: data.nickname || null,
+      result_type: data.resultType,
+    });
+
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return;
+    }
+
+    if (opts?.onSuccess) opts.onSuccess();
   },
+  data: null,
 });
 
 const useGetQuizStats = () => ({
@@ -18,13 +36,42 @@ const useGetQuizStats = () => ({
 });
 
 const useGetTeamResults = (teamId: string) => {
-  const results = JSON.parse(
-    localStorage.getItem(`quiz-results-${teamId || "default"}`) || "[]"
-  );
+  const [results, setResults] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadResults = async () => {
+    if (!teamId) return;
+
+    setIsLoading(true);
+
+    const { data, error } = await supabase
+      .from("quiz_results")
+      .select("*")
+      .eq("team_code", teamId)
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setResults(
+        data.map((r) => ({
+          nickname: r.nickname,
+          resultType: r.result_type,
+          completedAt: r.created_at,
+        }))
+      );
+    }
+
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    loadResults();
+  }, [teamId]);
 
   return {
     data: { results },
-    isLoading: false,
+    isLoading,
+    dataUpdatedAt: Date.now(),
+    refetch: loadResults,
   };
 };
 

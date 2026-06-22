@@ -21,9 +21,12 @@ const useSubmitQuizResult = () => ({
     });
 
     if (error) {
-      console.error("Supabase insert error:", error);
-      return;
-    }
+  alert("Supabase chyba: " + error.message);
+  console.error("Supabase insert error:", error);
+  return;
+}
+
+alert("Výsledek uložen do Supabase!");
 
     if (opts?.onSuccess) opts.onSuccess();
   },

@@ -333,14 +333,7 @@ export default function App() {
   const queryClient = useQueryClient();
   const submittedRef = useRef(false);
 
-  const submitMutation = {
-  mutate: (_data: any, opts?: any) => {
-    if (opts?.onSuccess) {
-      opts.onSuccess();
-    }
-  },
-  data: null,
-};
+  const submitMutation = useSubmitQuizResult();
 
 const { data: globalStats } = useGetQuizStats();
 

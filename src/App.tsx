@@ -612,7 +612,7 @@ const refetchTeamResults = async () => {};
                   onChange={(e) => setNickname(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter" && nickname.trim()) handleStart(); }}
                   maxLength={30}
-                  placeholder="Tvůj přezdívka..."
+                  placeholder="Naklikej to tu..."
                   data-testid="input-nickname"
                   className="w-full md:w-80 px-5 py-3 text-lg bg-background border-2 border-border rounded text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors text-center font-semibold"
                 />

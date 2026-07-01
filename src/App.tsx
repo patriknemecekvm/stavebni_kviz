@@ -10,6 +10,9 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
+console.log("SUPABASE URL:", import.meta.env.VITE_SUPABASE_URL);
+console.log("SUPABASE KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY?.slice(0, 20));
+
 const useSubmitQuizResult = () => ({
   mutate: async (input: any, opts?: any) => {
     const data = input?.data ?? input;

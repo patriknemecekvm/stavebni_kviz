@@ -340,10 +340,12 @@ export default function App() {
 
 const { data: globalStats } = useGetQuizStats();
 
-const teamResultsData = useGetTeamResults(teamId ?? "").data;
-const teamResultsLoading = false;
-const dataUpdatedAt = Date.now();
-const refetchTeamResults = async () => {};
+const {
+  data: teamResultsData,
+  isLoading: teamResultsLoading,
+  dataUpdatedAt,
+  refetch: refetchTeamResults,
+} = useGetTeamResults(teamId ?? "");
     
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -355,10 +357,17 @@ const refetchTeamResults = async () => {};
       submitMutation.mutate(
         { data: { resultType: resultKey, teamId: teamId ?? undefined, nickname: nickname.trim() || undefined } },
         {
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: getGetQuizStatsQueryKey() });
-            if (teamId) queryClient.invalidateQueries({ queryKey: getGetTeamResultsQueryKey(teamId) });
-          }
+          onSuccess: async () => {
+  queryClient.invalidateQueries({ queryKey: getGetQuizStatsQueryKey() });
+
+  if (teamId) {
+    queryClient.invalidateQueries({
+      queryKey: getGetTeamResultsQueryKey(teamId),
+    });
+
+    await refetchTeamResults();
+  }
+}
         }
       );
     }

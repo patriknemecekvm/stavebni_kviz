@@ -3,81 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
 
-console.log("SUPABASE URL:", import.meta.env.VITE_SUPABASE_URL);
-console.log("SUPABASE KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY?.slice(0, 20));
-
-const useSubmitQuizResult = () => ({
-  mutate: async (input: any, opts?: any) => {
-    const data = input?.data ?? input;
-
-    const { error } = await supabase.from("quiz_results").insert({
-      team_code: data.teamId || "default",
-      nickname: data.nickname || null,
-      result_type: data.resultType,
-    });
-
-    if (error) {
-  alert("Supabase chyba: " + error.message);
-  console.error("Supabase insert error:", error);
-  return;
-}
-
-alert("Výsledek uložen do Supabase!");
-
-    if (opts?.onSuccess) opts.onSuccess();
-  },
-  data: null,
-});
-
-const useGetQuizStats = () => ({
-  data: null,
-  isLoading: false,
-});
-
-const useGetTeamResults = (teamId: string) => {
-  const [results, setResults] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const loadResults = async () => {
-    if (!teamId) return;
-
-    setIsLoading(true);
-
-    const { data, error } = await supabase
-      .from("quiz_results")
-      .select("*")
-      .eq("team_code", teamId)
-      .order("created_at", { ascending: false });
-
-    if (!error && data) {
-      setResults(
-        data.map((r) => ({
-          nickname: r.nickname,
-          resultType: r.result_type,
-          completedAt: r.created_at,
-        }))
-      );
-    }
-
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    loadResults();
-  }, [teamId]);
-
-  return {
-    data: { results },
-    isLoading,
-    dataUpdatedAt: Date.now(),
-    refetch: loadResults,
-  };
-};
-
-const getGetQuizStatsQueryKey = () => ["quiz-stats"];
-const getGetTeamResultsQueryKey = () => ["team-results"];
+import {
+  useSubmitQuizResult,
+  useGetQuizStats,
+  useGetTeamResults,
+  getGetQuizStatsQueryKey,
+  getGetTeamResultsQueryKey,
+} from "@/hooks/useQuizResults";
 
 interface Question {
   q: string;
@@ -324,12 +257,16 @@ function generateTeamId(): string {
 
 export default function App() {
   const [gameState, setGameState] = useState<"landing" | "quiz" | "results" | "stats">("landing");
+  
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<("A" | "B" | "C" | "D")[]>([]);
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
   const [resultKey, setResultKey] = useState<ResultKey>("DRIC");
   const [nickname, setNickname] = useState("");
-  const [teamId, setTeamId] = useState<string | null>(() => getTeamIdFromPath());
+  const [teamId, setTeamId] = useState<string | null>(
+    () => getTeamIdFromPath()
+  );
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const submittedRef = useRef(false);
